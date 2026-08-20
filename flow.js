@@ -13,6 +13,12 @@ const enterApp = (view = "overview") => {
   document.querySelector(".app-shell").style.display = "flex";
   document.querySelector(`[data-view="${view}"]`)?.click();
 };
+const openWizard = () => {
+  landing.style.display = "none";
+  document.querySelector(".app-shell").style.display = "flex";
+  wizardStep = 0;
+  wizardModal.classList.add("show");
+};
 
 document.querySelector("#broadcastCta").addEventListener("click", () => openAuth("broadcaster"));
 document.querySelector("#listenCta").addEventListener("click", () => {
@@ -21,9 +27,12 @@ document.querySelector("#listenCta").addEventListener("click", () => {
   document.querySelector('[data-view="listen"]').click();
 });
 document.querySelector("#landingLogin").addEventListener("click", () => openAuth("listener"));
+document.querySelector("#startBroadcast").addEventListener("click", openWizard);
+document.querySelector("#setupBroadcast").addEventListener("click", openWizard);
 document.querySelectorAll("[data-close]").forEach((button) => button.addEventListener("click", () => {
   authModal.classList.remove("show");
   wizardModal.classList.remove("show");
+  playerModal?.classList.remove("show");
 }));
 document.querySelectorAll("[data-account]").forEach((button) => button.addEventListener("click", () => openAuth(button.dataset.account)));
 
@@ -75,6 +84,51 @@ wizardModal.addEventListener("click", (event) => {
   wizardModal.classList.remove("show");
   enterApp("overview");
   window.sonoraShowToast?.();
+});
+
+const playerModal = document.querySelector("#playerModal");
+const openPlayer = (card) => {
+  const title = card?.dataset.title || card?.querySelector("strong")?.textContent || "Live church audio";
+  document.querySelector("#playerTitle").textContent = title;
+  document.querySelector("#nowPlaying").textContent = title;
+  playerModal.classList.add("show");
+  document.querySelector("#miniPlayer").classList.add("visible");
+};
+document.querySelectorAll(".live-card, .discover-card").forEach((card) => {
+  card.addEventListener("click", (event) => {
+    if (!event.target.closest("button")) openPlayer(card);
+  });
+});
+document.querySelectorAll(".round-play, .discover-play").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    openPlayer(button.closest(".live-card, .discover-card"));
+  });
+});
+document.querySelector("#backToListen").addEventListener("click", () => playerModal.classList.remove("show"));
+document.querySelector("#mainPlayerButton").addEventListener("click", (event) => {
+  event.currentTarget.textContent = event.currentTarget.textContent === "▶" ? "Ⅱ" : "▶";
+});
+document.querySelector("#playerLike").addEventListener("click", (event) => {
+  event.currentTarget.textContent = event.currentTarget.textContent === "♡" ? "♥" : "♡";
+});
+document.querySelector("#followButton").addEventListener("click", (event) => {
+  const following = event.currentTarget.classList.toggle("following");
+  event.currentTarget.textContent = following ? "✓ Following" : "+ Follow church";
+});
+document.querySelector("#playerShare").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(window.location.href); } catch {}
+  window.sonoraShowToast?.();
+});
+document.querySelector("#commentForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const input = event.currentTarget.querySelector("input");
+  const body = input.value.trim();
+  if (!body) return;
+  const item = document.createElement("div");
+  item.innerHTML = `<i>YO</i><p><strong>You</strong><br />${body.replace(/[<>&]/g, "")}</p><span>♡</span>`;
+  document.querySelector(".comment-list").appendChild(item);
+  input.value = "";
 });
 
 document.querySelector(".app-shell").style.display = "none";
