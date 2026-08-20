@@ -47,24 +47,61 @@ const toggleAuthMode = () => {
 };
 document.querySelector("#authSwitch button").addEventListener("click", toggleAuthMode);
 
+let authSubmitting = false;
+let authCooldownTimer;
 document.querySelector("#authForm").addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (authSubmitting) return;
+  authSubmitting = true;
+  const submitButton = document.querySelector("#authSubmit");
+  const originalButtonText = submitButton.innerHTML;
+  submitButton.disabled = true;
+  submitButton.textContent = "Connecting…";
   const form = new FormData(event.currentTarget);
   const accountType = document.querySelector("[data-account].selected").dataset.account;
   const isSignin = event.currentTarget.dataset.mode === "signin";
-  if (window.Sonora) {
-    const result = isSignin
-      ? await window.Sonora.signIn(form.get("email"), form.get("password"))
-      : await window.Sonora.signUp({ email: form.get("email"), password: form.get("password"), username: form.get("username"), firstName: form.get("firstName"), lastName: form.get("lastName"), accountType });
-    if (result.error) {
-      document.querySelector("#authSub").textContent = result.error.message;
-      return;
+  try {
+    if (window.Sonora) {
+      const result = isSignin
+        ? await window.Sonora.signIn(form.get("email"), form.get("password"))
+        : await window.Sonora.signUp({ email: form.get("email"), password: form.get("password"), username: form.get("username"), firstName: form.get("firstName"), lastName: form.get("lastName"), accountType });
+      if (result.error) {
+        const isRateLimited = result.error.status === 429 || /rate limit|too many requests/i.test(result.error.message || "");
+        document.querySelector("#authSub").textContent = isRateLimited
+          ? "Supabase is temporarily limiting new signups. Wait a few minutes, then try once—or use Sign in if this email was already registered."
+          : result.error.message;
+        if (isRateLimited) {
+          let seconds = 30;
+          submitButton.textContent = `Try again in ${seconds}s`;
+          clearInterval(authCooldownTimer);
+          authCooldownTimer = setInterval(() => {
+            seconds -= 1;
+            submitButton.textContent = seconds > 0 ? `Try again in ${seconds}s` : originalButtonText;
+            if (seconds <= 0) {
+              clearInterval(authCooldownTimer);
+              authCooldownTimer = null;
+              submitButton.disabled = false;
+            }
+          }, 1000);
+        }
+        return;
+      }
+    }
+    if (accountType === "broadcaster") {
+      authModal.classList.remove("show");
+      wizardModal.classList.add("show");
+    } else enterApp("listen");
+  } catch (error) {
+    document.querySelector("#authSub").textContent = "We couldn’t reach Supabase right now. Check your connection and try again.";
+  } finally {
+    authSubmitting = false;
+    if (!authCooldownTimer) {
+      submitButton.disabled = false;
+      submitButton.innerHTML = originalButtonText;
+    } else {
+      setTimeout(() => { submitButton.disabled = false; }, 30000);
     }
   }
-  if (accountType === "broadcaster") {
-    authModal.classList.remove("show");
-    wizardModal.classList.add("show");
-  } else enterApp("listen");
 });
 
 const wizardPages = [
