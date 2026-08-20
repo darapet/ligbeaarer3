@@ -4,6 +4,7 @@ const showToast = () => {
   window.clearTimeout(window.toastTimer);
   window.toastTimer = window.setTimeout(() => toast.classList.remove("show"), 4200);
 };
+window.sonoraShowToast = showToast;
 
 document.querySelector("#startBroadcast").addEventListener("click", showToast);
 document.querySelector("#setupBroadcast").addEventListener("click", showToast);

@@ -12,8 +12,19 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="listener.css" />
     <link rel="stylesheet" href="orange-theme.css" />
+    <link rel="stylesheet" href="flow.css" />
   </head>
   <body>
+    <div class="landing-screen" id="landingScreen">
+      <header class="landing-nav"><a class="brand" href="#"><span class="brand-mark">✦</span><span>sonora</span></a><div class="landing-links"><a href="#how">How it works</a><a href="#about">About Sonora</a></div><button class="landing-login" id="landingLogin">Sign in <span>↗</span></button></header>
+      <section class="landing-hero">
+        <div class="landing-copy"><p class="eyebrow">A NEW WAY TO GATHER</p><h1>Church is more<br />than a <em>place.</em></h1><p>Share the moment, even when miles keep you apart. Sonora brings your church community closer through live audio.</p><div class="landing-actions"><button class="button button-dark" id="broadcastCta">Broadcast your church <span>↗</span></button><button class="button button-quiet" id="listenCta">Listen to a service <span>▶</span></button></div><div class="landing-proof"><div class="proof-avatars"><i>AG</i><i>HM</i><i>NC</i><i>+</i></div><span>Trusted by growing communities<br /><strong>all over the world</strong></span></div></div>
+        <div class="landing-scene"><div class="scene-glow"></div><div class="scene-card scene-back"><span>✦</span><strong>A place to belong.</strong></div><div class="scene-card scene-front"><div class="scene-card-top"><span class="live-badge"><i></i> LIVE NOW</span><span>◉ 248</span></div><div class="scene-art">〰〰〰</div><div class="scene-card-bottom"><span>Sunday Worship</span><strong>Abundant Grace</strong><button>▶</button></div></div><div class="scene-note">“We can feel the room<br />even from here.” <span>— Maya, Lagos</span></div></div>
+      </section>
+      <section class="landing-strip" id="how"><div><span class="strip-number">01</span><strong>Broadcast the moment</strong><small>Simple studio tools for your church.</small></div><div><span class="strip-number">02</span><strong>Gather your people</strong><small>Give your community a place to listen.</small></div><div><span class="strip-number">03</span><strong>Keep the conversation</strong><small>Audio that lives beyond Sunday.</small></div></section>
+    </div>
+    <div class="auth-modal" id="authModal"><div class="auth-card"><button class="modal-close" data-close>×</button><div class="auth-brand">✦ sonora</div><p class="eyebrow" id="authEyebrow">WELCOME BACK</p><h2 id="authTitle">Come on in.</h2><p class="auth-sub" id="authSub">Sign in to continue listening with your community.</p><div class="account-toggle"><button class="selected" data-account="listener">Listener</button><button data-account="broadcaster">Broadcaster</button></div><form id="authForm"><div class="form-row" id="nameFields"><label>First name<input name="firstName" placeholder="Maya" /></label><label>Last name<input name="lastName" placeholder="Adeyemi" /></label></div><label>Username<input name="username" placeholder="@yourname" /></label><label>Email address<input type="email" name="email" placeholder="you@example.com" required /></label><label>Password<input type="password" name="password" placeholder="At least 8 characters" required /></label><button class="button button-dark full" type="submit" id="authSubmit">Create account <span>↗</span></button></form><p class="auth-switch" id="authSwitch">Already have an account? <button>Sign in</button></p></div></div>
+    <div class="wizard-modal" id="wizardModal"><div class="wizard-card"><button class="modal-close" data-close>×</button><div class="wizard-top"><div class="auth-brand">✦ sonora <span>/ studio</span></div><div class="wizard-steps"><i class="active">1</i><b></b><i>2</i><b></b><i>3</i><b></b><i>4</i></div></div><div class="wizard-body" id="wizardBody"><p class="eyebrow">BROADCAST SETUP · 01</p><h2>Set the scene.</h2><p class="wizard-sub">Tell your community what they’re about to hear.</p><label>Broadcast title<input placeholder="e.g. Sunday Worship · The Waiting Season" /></label><label>Speaker or host<input placeholder="e.g. Pastor Daniel" /></label><label>Venue <span class="optional">OPTIONAL</span><input placeholder="e.g. Abundant Grace Chapel" /></label><div class="wizard-actions"><button class="button button-dark next-step">Continue <span>→</span></button></div></div></div></div>
     <div class="app-shell">
       <aside class="sidebar">
         <a class="brand" href="#"><span class="brand-mark">✦</span><span>sonora</span></a>
@@ -122,5 +133,6 @@
     <script src="config.js"></script>
     <script src="supabase-client.js"></script>
     <script src="app.js"></script>
+    <script src="flow.js"></script>
   </body>
 </html>
