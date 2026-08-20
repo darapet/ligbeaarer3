@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="listener.css" />
   </head>
   <body>
     <div class="app-shell">
@@ -84,8 +85,37 @@
             </div>
           </section>
         </div>
+        <div class="listener-view" id="listener-view">
+          <section class="listener-hero">
+            <div class="listener-hero-copy">
+              <p class="eyebrow">A QUIET PLACE TO LISTEN</p>
+              <h1>Find a word for<br /><em>where you are.</em></h1>
+              <p>Live worship, honest conversations, and messages from communities around you.</p>
+              <div class="search-box"><span>⌕</span><input id="audioSearch" placeholder="Search churches, speakers, or topics" /><kbd>⌘ K</kbd></div>
+            </div>
+            <div class="hero-art"><div class="hero-sun">✦</div><div class="hero-horizon"></div><div class="hero-rays"></div></div>
+          </section>
+          <section class="listener-section">
+            <div class="section-title"><div><p class="eyebrow">HAPPENING NOW</p><h2>Live near you</h2></div><button class="text-button">See all →</button></div>
+            <div class="live-cards">
+              <article class="live-card selected-stream" data-title="Sunday Worship · The Waiting Season"><div class="live-art live-art-one"><span class="live-badge"><i></i> LIVE</span><div class="live-wave">〰〰〰</div></div><div class="live-card-copy"><strong>Sunday Worship · The Waiting Season</strong><span>Abundant Grace Church</span><div><b>◉ 248 listening</b><button class="round-play">▶</button></div></div></article>
+              <article class="live-card" data-title="Morning Prayer Room"><div class="live-art live-art-two"><span class="live-badge"><i></i> LIVE</span><div class="live-wave">〰〰〰</div></div><div class="live-card-copy"><strong>Morning Prayer Room</strong><span>House of Mercy</span><div><b>◉ 96 listening</b><button class="round-play">▶</button></div></div></article>
+              <article class="live-card" data-title="The Honest Table"><div class="live-art live-art-three"><span class="live-badge"><i></i> LIVE</span><div class="live-wave">〰〰〰</div></div><div class="live-card-copy"><strong>The Honest Table</strong><span>New City Fellowship</span><div><b>◉ 71 listening</b><button class="round-play">▶</button></div></div></article>
+            </div>
+          </section>
+          <section class="listener-section browse-section">
+            <div class="section-title"><div><p class="eyebrow">FROM YOUR COMMUNITY</p><h2>Recently broadcast</h2></div><div class="filter-pills"><button class="filter-pill active">All</button><button class="filter-pill">Worship</button><button class="filter-pill">Teaching</button></div></div>
+            <div class="discover-grid">
+              <article class="discover-card"><div class="discover-art discover-one">✦</div><strong>New Mercies</strong><span>Morning Devotion · 32 min</span><button class="discover-play">▶</button></article>
+              <article class="discover-card"><div class="discover-art discover-two">◌</div><strong>Midweek Worship & Prayer</strong><span>Abundant Grace · 1 hr</span><button class="discover-play">▶</button></article>
+              <article class="discover-card"><div class="discover-art discover-three">☼</div><strong>When Faith Feels Small</strong><span>Riverside Chapel · 42 min</span><button class="discover-play">▶</button></article>
+              <article class="discover-card"><div class="discover-art discover-four">✧</div><strong>Grace in the Ordinary</strong><span>Cornerstone · 28 min</span><button class="discover-play">▶</button></article>
+            </div>
+          </section>
+        </div>
       </main>
     </div>
+    <div class="mini-player" id="miniPlayer"><div class="mini-art">✦</div><div><strong id="nowPlaying">Sunday Worship · The Waiting Season</strong><small>Abundant Grace Church</small></div><button class="player-icon">♡</button><button class="player-play" id="playerPlay">▶</button><div class="mini-progress"><i></i></div></div>
     <div class="toast" id="toast"><span>✦</span><div><strong>Broadcast studio</strong><small>Your studio setup is coming next.</small></div><button>×</button></div>
     <script src="app.js"></script>
   </body>
