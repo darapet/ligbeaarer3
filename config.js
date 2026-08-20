@@ -1,0 +1,1 @@
+window.SONORA_CONFIG = { url: "https://supabase.com/dashboard/project/jzrcxjjcsohyxqzebgda", anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cmN4ampjc29oeXhxemViZ2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNTg4MDYsImV4cCI6MjEwMjgzNDgwNn0.owop7Pkp3OCGPbt9yqdeC2LNB1z0i-3Hbm9yOimALdg" };
