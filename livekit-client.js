@@ -1,6 +1,17 @@
 window.SonoraLiveKit = (() => {
   let room;
+  let sdk = window.LivekitClient || window.LiveKitClient || null;
   const tokenEndpoint = `${window.SONORA_CONFIG.url}/functions/v1/livekit-token`;
+
+  async function getSDK() {
+    if (sdk) return sdk;
+    try {
+      sdk = await import("https://cdn.jsdelivr.net/npm/livekit-client@2.15.0/+esm");
+      return sdk;
+    } catch {
+      throw new Error("Live audio SDK could not load. Check your connection, then try again.");
+    }
+  }
 
   async function getToken(roomName, role) {
     const { data } = await window.Sonora.supabase.auth.getSession();
@@ -17,9 +28,9 @@ window.SonoraLiveKit = (() => {
 
   return {
     async join(roomName, role = "listener") {
-      if (!window.LivekitClient) throw new Error("Live audio SDK is unavailable. Refresh and try again.");
+      const livekit = await getSDK();
       const credentials = await getToken(roomName, role);
-      room = new window.LivekitClient.Room({ adaptiveStream: true, dynacast: true });
+      room = new livekit.Room({ adaptiveStream: true, dynacast: true });
       await room.connect(credentials.url, credentials.token);
       return room;
     },
