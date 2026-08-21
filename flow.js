@@ -67,8 +67,11 @@ document.querySelector("#authForm").addEventListener("submit", async (event) => 
         : await window.Sonora.signUp({ email: form.get("email"), password: form.get("password"), username: form.get("username"), firstName: form.get("firstName"), lastName: form.get("lastName"), accountType });
       if (result.error) {
         const isRateLimited = result.error.status === 429 || /rate limit|too many requests/i.test(result.error.message || "");
+        const isFetchError = /fetch|network|failed to fetch/i.test(result.error.message || "");
         document.querySelector("#authSub").textContent = isRateLimited
           ? "Supabase is temporarily limiting new signups. Wait a few minutes, then try once—or use Sign in if this email was already registered."
+          : isFetchError
+            ? "Supabase could not be reached. Confirm the project API URL is https://jzrcxjjcsohyxqzebgda.supabase.co, then refresh this page."
           : result.error.message;
         if (isRateLimited) {
           let seconds = 30;
@@ -172,6 +175,16 @@ const startLiveStudio = () => {
   const body = document.querySelector("#wizardBody");
   body.innerHTML = '<div class="live-studio-head"><div><p class="eyebrow">YOU ARE LIVE</p><h2>Sunday Worship</h2><p class="wizard-sub">Abundant Grace Chapel · Pastor Daniel</p></div><span class="live-pill"><i></i> LIVE <b id="liveTimer">00:00</b></span></div><div class="live-studio-wave"><div class="live-wave-large">〰〰〰〰〰</div><span>Live audio signal</span></div><div class="live-studio-stats"><div><strong>248</strong><small>Listeners</small></div><div><strong>18</strong><small>Comments</small></div><div><strong>00:00</strong><small>Duration</small></div></div><div class="live-controls"><label>Volume <input type="range" min="0" max="100" value="80" /></label><label>Bass <input type="range" min="-12" max="12" value="0" /></label><label>Treble <input type="range" min="-12" max="12" value="0" /></label><label>Echo <input type="range" min="0" max="100" value="12" /></label></div><div class="live-comments"><strong>Live comments</strong><span>“This is beautiful 🙏” · “Joining from Accra” · “Amen!”</span></div><div class="wizard-actions"><button class="button button-end" id="endBroadcast">End broadcast</button></div>';
   let seconds = 0;
+  window.SonoraLiveKit?.join("abundant-grace-live", "broadcaster")
+    .then(() => window.SonoraLiveKit.publishMicrophone())
+    .then(() => {
+      const status = document.querySelector(".live-comments span");
+      if (status) status.textContent = "Live audio connected. Your listeners can hear you now.";
+    })
+    .catch((error) => {
+      const status = document.querySelector(".live-comments span");
+      if (status) status.textContent = error.message;
+    });
   liveTimer = setInterval(() => {
     seconds += 1;
     const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -183,6 +196,7 @@ const startLiveStudio = () => {
 wizardModal.addEventListener("click", (event) => {
   if (!event.target.closest("#endBroadcast")) return;
   clearInterval(liveTimer);
+  window.SonoraLiveKit?.leave();
   document.querySelector("#wizardBody").innerHTML = '<div class="ended-state"><div>✓</div><p class="eyebrow">BROADCAST ENDED</p><h2>That was a beautiful gathering.</h2><p class="wizard-sub">Would you like to keep this audio available for your community?</p><div class="end-actions"><button class="button button-dark" id="saveBroadcast">Save broadcast</button><button class="button button-quiet" id="discardBroadcast">Don’t save</button></div></div>';
 });
 wizardModal.addEventListener("click", (event) => {
@@ -199,6 +213,9 @@ const openPlayer = (card) => {
   document.querySelector("#nowPlaying").textContent = title;
   playerModal.classList.add("show");
   document.querySelector("#miniPlayer").classList.add("visible");
+  window.SonoraLiveKit?.join("abundant-grace-live", "listener").catch((error) => {
+    document.querySelector("#playerTitle").dataset.error = error.message;
+  });
 };
 document.querySelectorAll(".live-card, .discover-card").forEach((card) => {
   card.addEventListener("click", (event) => {
@@ -211,7 +228,10 @@ document.querySelectorAll(".round-play, .discover-play").forEach((button) => {
     openPlayer(button.closest(".live-card, .discover-card"));
   });
 });
-document.querySelector("#backToListen").addEventListener("click", () => playerModal.classList.remove("show"));
+document.querySelector("#backToListen").addEventListener("click", () => {
+  playerModal.classList.remove("show");
+  window.SonoraLiveKit?.leave();
+});
 document.querySelector("#mainPlayerButton").addEventListener("click", (event) => {
   event.currentTarget.textContent = event.currentTarget.textContent === "▶" ? "Ⅱ" : "▶";
 });
