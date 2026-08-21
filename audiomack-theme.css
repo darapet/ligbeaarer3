@@ -1,0 +1,141 @@
+/* Sonora's music-first studio theme: dark, warm, and built around the player. */
+:root{
+  --ink:#f4f5f1;
+  --muted:#8d938d;
+  --line:#292d2a;
+  --paper:#101210;
+  --white:#181b19;
+  --purple:#ff784f;
+  --purple-soft:#2a1c18;
+  --orange:#ff784f;
+  --green:#72c48c;
+}
+body{background:#101210;color:#f4f5f1}
+.landing-screen{background:#101210;color:#f4f5f1}
+.landing-nav{border-color:#292d2a}
+.landing-nav .brand,.landing-links a,.landing-login{color:#e6e9e3}
+.landing-copy h1{color:#fff}
+.landing-copy>p:not(.eyebrow),.landing-proof{color:#8d958d}
+.landing-proof strong{color:#cbd1c9}
+.landing-strip{border-color:#292d2a}
+.landing-strip strong{color:#edf0eb}
+.landing-strip small{color:#7e877f}
+.scene-glow{background:#342019}
+.scene-back{background:#1d2520}
+.scene-front,.scene-note{background:#1b1f1c;color:#fff}
+.scene-card-bottom strong{color:#fff}
+.auth-card,.wizard-card{background:#191d1a;color:#f4f5f1;border:1px solid #303731}
+.auth-card input,.wizard-body input,.wizard-body textarea{background:#222723;border-color:#3a433b;color:#fff}
+.account-toggle{background:#222723}
+.account-toggle button{color:#8b948b}
+.account-toggle button.selected{background:#343a34;color:#fff}
+.auth-sub,.wizard-sub{color:#909990}
+.auth-switch{color:#8b948b}
+.wizard-steps i{border-color:#3b443c;color:#8d968d}
+.wizard-steps b{background:#394039}
+.modal-close{color:#899289}
+.wizard-actions{background:#191d1a}
+.mic-test,.ready-card,.advanced-sound{border-color:#394239;background:#202521}
+.mic-test strong,.ready-card strong{color:#f5f7f2}
+.test-button{background:#202521;border-color:#3b443c}
+.equalizer,.eq-preview{background:#211b19}
+.preview-card{background:linear-gradient(135deg,#1d2920,#a94d30)}
+.app-shell{background:#101210}
+.sidebar{background:#171a18;border-color:#292d2a;width:238px;padding:25px 15px 18px}
+.sidebar .brand{color:#fff;margin:0 12px 38px}
+.brand-mark{background:#ff784f;color:#151715;border-radius:7px}
+.profile-mini{border-color:#292d2a;padding-bottom:24px}
+.profile-mini strong{color:#f1f3ee}
+.profile-mini span,.nav-link,.breadcrumbs{color:#8d938d}
+.avatar{background:#ffb18f;color:#532819}
+.nav{padding-top:22px}
+.nav-label{color:#5e665f}
+.nav-link{border-radius:7px}
+.nav-link span{color:#69716a}
+.nav-link.active{background:#2a1c18;color:#ff936f}
+.nav-link.active span{color:#ff784f}
+.nav-link b{background:#292e2a;color:#abb2aa}
+.help-card{background:#211d1b}
+.help-card strong{color:#f0f2ed}
+.help-card small{color:#858d84}
+.topbar{height:70px;background:#101210;border-color:#292d2a;padding:0 4.2%}
+.breadcrumbs span{color:#656d66}
+.breadcrumbs strong{color:#f4f5f1}
+.top-profile{color:#d5dad3}
+.notification{color:#9aa29a}
+.page{max-width:1440px;padding:42px 4.2% 85px}
+.welcome-row{margin-bottom:30px}
+.welcome-row h1{font-size:40px;color:#fff}
+.welcome-row h1 em{color:#ff8c68}
+.lede{color:#8d938d}
+.eyebrow{color:#737b73}
+.button-dark{background:#ff784f;color:#171916;box-shadow:0 8px 20px #ff784f2e}
+.button-dark:hover{background:#ff916e}
+.stats-grid{gap:12px}
+.stat-card,.panel{background:#171a18;border-color:#292d2a;box-shadow:none}
+.stat-card.accent{background:linear-gradient(135deg,#2c1d19,#171a18);border-color:#4c2b22}
+.stat-card strong{color:#fff}
+.stat-head,.stat-foot{color:#879087}
+.trend{color:#75c68b}
+.panel-heading h2,.recent-panel h2{color:#f5f6f2}
+.status-pill{background:#202722;color:#8bb598}
+.studio-visual{background:linear-gradient(135deg,#1d2820,#44271e)}
+.studio-copy strong{color:#fff}
+.studio-copy span,.panel-footer{color:#89928a}
+.panel-footer{border-color:#292d2a}
+.chart{background:#141715}
+.chart-main .gridlines i{border-color:#292d2a}
+.chart-line{border-color:#ff784f}
+.chart-area{background:#ff784f14}
+.chart-y,.chart-x,.chart-legend{color:#727a72}
+.recent-panel{margin-top:12px}
+.broadcast-row{border-color:#292d2a}
+.broadcast-row:hover{background:#1d211e}
+.stream-info strong{color:#eef1eb}
+.stream-info span,.stream-stat,.duration{color:#7f887f}
+.text-button{color:#ff8b68}
+
+/* Listener home */
+.listener-view{background:#101210;color:#f4f5f1;padding:42px 4.2% 110px}
+.listener-hero{background:linear-gradient(115deg,#2b1c18 0%,#171d19 58%,#151a17 100%);border:1px solid #432a21;border-radius:12px;min-height:330px;padding:52px 5%;overflow:hidden}
+.listener-hero h1{color:#fff;font-size:49px}
+.listener-hero h1 em{color:#ff8d68}
+.listener-hero-copy>p:not(.eyebrow){color:#a2aaa1}
+.search-box{background:#222724;border-color:#343a34;color:#8e978e}
+.search-box input{color:#fff}
+.search-box kbd{background:#303731;color:#9ea79e}
+.section-title{border-bottom-color:#292d2a}
+.section-title h2{color:#fff}
+.live-card,.discover-card{background:#181c19;border-color:#292d2a}
+.live-card:hover,.discover-card:hover{box-shadow:0 12px 30px #0008}
+.live-card-copy strong,.discover-card strong{color:#f0f2ed}
+.live-card-copy>span,.discover-card span{color:#879087}
+.live-card-copy b{color:#7ac88e}
+.round-play,.discover-play{background:#ff784f;color:#171916}
+.filter-pill{background:#181c19;border-color:#343a34;color:#9da69d}
+.filter-pill.active{background:#ff784f;border-color:#ff784f;color:#171916}
+.mini-player{left:calc(238px + 4.2%);right:4.2%;background:#252a26;border:1px solid #3a403b}
+.mini-art{background:#ff784f;color:#171916}
+.player-play{background:#ff784f;color:#171916}
+.mini-progress{background:#4d554d}
+.mini-progress i{background:#ff784f}
+.player-modal{background:#080a09ed}
+.player-page{background:#171a18;border:1px solid #303631}
+.player-details h2,.comments-heading strong{color:#fff}
+.player-church,.player-social,.comments-heading span,.comment-list p{color:#8c958c}
+.player-social{border-color:#292d2a}
+.player-social button{background:#202521;border-color:#414a41;color:#ff8b68}
+.comment-form{background:#202521;border-color:#3b443c}
+.comment-form input{color:#fff}
+.comment-form button{background:#ff784f;color:#171916}
+
+@media(max-width:700px){
+  .sidebar{width:260px}
+  .topbar{padding:0 18px}
+  .page{padding:30px 18px 85px}
+  .welcome-row h1{font-size:32px}
+  .listener-view{padding:28px 18px 110px}
+  .listener-hero{padding:34px 24px}
+  .listener-hero h1{font-size:37px}
+  .mini-player{left:18px;right:18px}
+}
