@@ -1,4 +1,5 @@
 const toast = document.querySelector("#toast");
+let liveRefreshTimer = null;
 const showToast = () => {
   toast.classList.add("show");
   window.clearTimeout(window.toastTimer);
@@ -25,6 +26,14 @@ document.querySelectorAll("[data-view], [data-view-link]").forEach((link) => {
     document.querySelector("#listener-view").classList.toggle("visible", target === "listen");
     document.querySelector("#profile-settings").classList.toggle("visible", target === "profile");
     document.querySelector("#miniPlayer").classList.toggle("visible", target === "listen");
+    if (liveRefreshTimer) {
+      clearInterval(liveRefreshTimer);
+      liveRefreshTimer = null;
+    }
+    if (target === "listen") {
+      loadRealData().catch(() => {});
+      liveRefreshTimer = setInterval(() => loadRealData().catch(() => {}), 8000);
+    }
     if (!["overview", "listen", "profile"].includes(target)) showToast();
   });
 });

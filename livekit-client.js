@@ -22,7 +22,13 @@ window.SonoraLiveKit = (() => {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ room: roomName, role })
     });
-    if (!response.ok) throw new Error(response.status === 404 ? "The live audio token function is not deployed yet." : `Live audio could not start (${response.status}).`);
+    if (!response.ok) {
+      let detail = "";
+      try { detail = (await response.json()).error || ""; } catch {}
+      throw new Error(response.status === 404
+        ? "The live audio token function is not deployed yet."
+        : detail || `Live audio could not start (${response.status}).`);
+    }
     return response.json();
   }
 
@@ -30,6 +36,7 @@ window.SonoraLiveKit = (() => {
     async join(roomName, role = "listener") {
       const livekit = await getSDK();
       const credentials = await getToken(roomName, role);
+      room?.disconnect();
       room = new livekit.Room({ adaptiveStream: true, dynacast: true });
       await room.connect(credentials.url, credentials.token);
       return room;

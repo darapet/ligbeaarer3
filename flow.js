@@ -150,6 +150,7 @@ wizardModal.addEventListener("click", (event) => {
 let audioContext;
 let micStream;
 let micAnimation;
+const broadcastRoom = (broadcastId) => `broadcast-${broadcastId}`;
 const startMicTest = async () => {
   const status = document.querySelector("#micStatus");
   const button = document.querySelector("#micTestButton");
@@ -211,7 +212,7 @@ const startLiveStudio = () => {
     }).select().single();
     if (error) throw error;
     currentBroadcast = broadcast;
-    window.SonoraLiveKit?.join("abundant-grace-live", "broadcaster")
+    window.SonoraLiveKit?.join(broadcastRoom(broadcast.id), "broadcaster")
   })
     .then(() => window.SonoraLiveKit.publishMicrophone())
     .then(() => {
@@ -221,6 +222,11 @@ const startLiveStudio = () => {
     .catch((error) => {
       const status = document.querySelector(".live-comments span");
       if (status) status.textContent = error.message;
+      if (currentBroadcast?.id) {
+        window.Sonora.supabase.from("broadcasts")
+          .update({ status: "ended", ended_at: new Date().toISOString() })
+          .eq("id", currentBroadcast.id);
+      }
     });
   liveTimer = setInterval(() => {
     seconds += 1;
@@ -285,8 +291,9 @@ const openPlayer = (card) => {
       renderComments(comments);
     });
   }
-  window.SonoraLiveKit?.join("abundant-grace-live", "listener").catch((error) => {
+  window.SonoraLiveKit?.join(broadcastRoom(currentBroadcast.id), "listener").catch((error) => {
     document.querySelector("#playerTitle").dataset.error = error.message;
+    document.querySelector("#playerChurch").textContent = error.message;
   });
 };
 document.querySelectorAll(".live-card, .discover-card").forEach((card) => {
