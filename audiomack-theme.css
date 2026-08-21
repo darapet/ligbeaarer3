@@ -96,6 +96,16 @@ body{background:#101210;color:#f4f5f1}
 .recent-panel{margin-top:12px}
 .empty-state{padding:28px 18px;text-align:center;color:#7f897f;font-size:12px}
 .empty-chart{min-height:180px;display:grid;place-items:center}
+.settings-view{display:none;max-width:980px;margin:0 auto;padding:42px 4.2% 90px}
+.settings-view.visible{display:block}
+.settings-heading h1{font-size:40px;margin:0;color:#fff}.settings-heading p:not(.eyebrow){color:#8d958d}
+.settings-form{margin-top:28px;padding:24px;background:#171a18;border:1px solid #292d2a;border-radius:10px}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+.settings-grid label,.password-form label{font-size:10px;color:#89928a}.settings-grid .wide{grid-column:1/-1}
+.settings-grid input,.settings-grid textarea,.password-form input{display:block;width:100%;margin-top:7px;background:#222723;border:1px solid #3a433b;border-radius:6px;color:#fff;padding:11px;font:12px "DM Sans";outline-color:#ff784f}
+.settings-grid textarea{resize:vertical}.settings-actions{display:flex;align-items:center;gap:15px;margin-top:22px}.settings-actions span,.password-form>span{font-size:11px;color:#72c48c}
+.password-form{display:grid;grid-template-columns:1fr 1fr;align-items:end}.password-form h2{font-size:20px;margin:0;color:#fff}.password-form .button{justify-self:end}.password-form>span{grid-column:1/-1}
+@media(max-width:700px){.settings-view{padding:30px 18px 90px}.settings-grid,.password-form{grid-template-columns:1fr}.settings-grid .wide{grid-column:auto}.password-form .button{justify-self:start}}
 .broadcast-row{border-color:#292d2a}
 .broadcast-row:hover{background:#1d211e}
 .stream-info strong{color:#eef1eb}

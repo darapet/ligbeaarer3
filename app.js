@@ -23,8 +23,9 @@ document.querySelectorAll("[data-view], [data-view-link]").forEach((link) => {
     document.querySelector(".sidebar").classList.remove("open");
     document.querySelector(".page").style.display = target === "overview" ? "" : "none";
     document.querySelector("#listener-view").classList.toggle("visible", target === "listen");
+    document.querySelector("#profile-settings").classList.toggle("visible", target === "profile");
     document.querySelector("#miniPlayer").classList.toggle("visible", target === "listen");
-    if (target !== "overview" && target !== "listen") showToast();
+    if (!["overview", "listen", "profile"].includes(target)) showToast();
   });
 });
 
@@ -78,6 +79,9 @@ const loadRealData = async () => {
     document.querySelector("#topProfileName").textContent = displayName || "Your profile";
     document.querySelector("#sidebarType").textContent = profile.account_type === "broadcaster" ? "Broadcaster account" : "Listener account";
     document.querySelector("#dashboardName").textContent = `${profile.first_name || profile.username || "there"}.`;
+    document.querySelectorAll("#profileForm [name]").forEach((field) => {
+      field.value = profile[field.name] || (field.name === "theme_color" ? "#ff784f" : "");
+    });
   }
   document.querySelector("#dashboardDate").textContent = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const broadcasts = ownBroadcasts || [];
@@ -100,6 +104,23 @@ const loadRealData = async () => {
   document.querySelector("#liveBroadcasts").innerHTML = live.length ? live.map((item) => renderBroadcast(item, "live")).join("") : '<div class="empty-state">No live broadcasts right now.</div>';
   document.querySelector("#publishedBroadcasts").innerHTML = published.length ? published.map((item) => renderBroadcast(item)).join("") : '<div class="empty-state">Published broadcasts will appear here.</div>';
 };
+
+document.querySelector("#profileForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const { data: { user } } = await window.Sonora.supabase.auth.getUser();
+  if (!user) return;
+  const updates = Object.fromEntries(new FormData(event.currentTarget).entries());
+  const { error } = await window.Sonora.updateProfile(user.id, updates);
+  document.querySelector("#profileSaveMessage").textContent = error ? error.message : "Profile saved.";
+  if (!error) loadRealData();
+});
+document.querySelector("#passwordForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const password = new FormData(event.currentTarget).get("password");
+  const { error } = await window.Sonora.changePassword(password);
+  document.querySelector("#passwordSaveMessage").textContent = error ? error.message : "Password updated.";
+  if (!error) event.currentTarget.reset();
+});
 
 window.addEventListener("sonora:authenticated", loadRealData);
 loadRealData().catch(() => {});

@@ -200,7 +200,19 @@ const startLiveStudio = () => {
   const venue = window.sonoraBroadcastVenue ? ` · ${window.sonoraBroadcastVenue.replace(/[<>&]/g, "")}` : "";
   body.innerHTML = `<div class="live-studio-head"><div><p class="eyebrow">YOU ARE LIVE</p><h2>${title.replace(/[<>&]/g, "")}</h2><p class="wizard-sub">${venue || "Live church audio"}</p></div><span class="live-pill"><i></i> LIVE <b id="liveTimer">00:00</b></span></div><div class="live-studio-wave"><div class="live-wave-large">〰〰〰〰〰</div><span>Live audio signal</span></div><div class="live-studio-stats"><div><strong id="liveListenerCount">0</strong><small>Listeners</small></div><div><strong id="liveCommentCount">0</strong><small>Comments</small></div><div><strong>00:00</strong><small>Duration</small></div></div><div class="live-controls"><label>Volume <input type="range" min="0" max="100" value="80" /></label><label>Bass <input type="range" min="-12" max="12" value="0" /></label><label>Treble <input type="range" min="-12" max="12" value="0" /></label><label>Echo <input type="range" min="0" max="100" value="12" /></label></div><div class="live-comments"><strong>Live comments</strong><span id="liveCommentMessage">Comments from listeners will appear here.</span></div><div class="wizard-actions"><button class="button button-end" id="endBroadcast">End broadcast</button></div>`;
   let seconds = 0;
-  window.SonoraLiveKit?.join("abundant-grace-live", "broadcaster")
+  window.Sonora.supabase.auth.getUser().then(async ({ data: { user } }) => {
+    if (!user) throw new Error("Please sign in before broadcasting.");
+    const { data: broadcast, error } = await window.Sonora.supabase.from("broadcasts").insert({
+      broadcaster_id: user.id,
+      title,
+      venue: window.sonoraBroadcastVenue || null,
+      status: "live",
+      started_at: new Date().toISOString()
+    }).select().single();
+    if (error) throw error;
+    currentBroadcast = broadcast;
+    window.SonoraLiveKit?.join("abundant-grace-live", "broadcaster")
+  })
     .then(() => window.SonoraLiveKit.publishMicrophone())
     .then(() => {
       const status = document.querySelector(".live-comments span");
@@ -222,22 +234,57 @@ wizardModal.addEventListener("click", (event) => {
   if (!event.target.closest("#endBroadcast")) return;
   clearInterval(liveTimer);
   window.SonoraLiveKit?.leave();
+  if (currentBroadcast?.id) window.Sonora.supabase.from("broadcasts").update({ status: "ended", ended_at: new Date().toISOString() }).eq("id", currentBroadcast.id);
   document.querySelector("#wizardBody").innerHTML = '<div class="ended-state"><div>✓</div><p class="eyebrow">BROADCAST ENDED</p><h2>That was a beautiful gathering.</h2><p class="wizard-sub">Would you like to keep this audio available for your community?</p><div class="end-actions"><button class="button button-dark" id="saveBroadcast">Save broadcast</button><button class="button button-quiet" id="discardBroadcast">Don’t save</button></div></div>';
 });
 wizardModal.addEventListener("click", (event) => {
   if (!event.target.closest("#saveBroadcast, #discardBroadcast")) return;
+  const shouldSave = event.target.closest("#saveBroadcast");
+  if (currentBroadcast?.id) {
+    const operation = shouldSave
+      ? window.Sonora.supabase.from("broadcasts").update({ status: "published" }).eq("id", currentBroadcast.id)
+      : window.Sonora.supabase.from("broadcasts").delete().eq("id", currentBroadcast.id);
+    operation.then(() => window.dispatchEvent(new CustomEvent("sonora:authenticated")));
+  }
   wizardModal.classList.remove("show");
   enterApp("overview");
   window.sonoraShowToast?.();
 });
 
 const playerModal = document.querySelector("#playerModal");
+let currentBroadcast = null;
+let currentUser = null;
+const renderComments = (comments = []) => {
+  const list = document.querySelector("#commentList");
+  if (!comments.length) {
+    list.innerHTML = '<div class="empty-state">No comments yet.</div>';
+    return;
+  }
+  list.innerHTML = comments.map((comment) => {
+    const profile = comment.profiles || {};
+    const name = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || profile.username || "Listener";
+    return `<div><i>${name.slice(0, 2).toUpperCase()}</i><p><strong>${name.replace(/[<>&]/g, "")}</strong><br />${comment.body.replace(/[<>&]/g, "")}</p><span>♡</span></div>`;
+  }).join("");
+};
 const openPlayer = (card) => {
   const title = card?.dataset.title || card?.querySelector("strong")?.textContent || "Live church audio";
   document.querySelector("#playerTitle").textContent = title;
   document.querySelector("#nowPlaying").textContent = title;
+  currentBroadcast = { id: card?.dataset.broadcastId, title };
   playerModal.classList.add("show");
   document.querySelector("#miniPlayer").classList.add("visible");
+  if (currentBroadcast.id && window.Sonora) {
+    window.Sonora.supabase.from("broadcasts").select("*, profiles(username, first_name, last_name, church_name)").eq("id", currentBroadcast.id).single().then(async ({ data }) => {
+      if (!data) return;
+      currentBroadcast = data;
+      const profile = data.profiles || {};
+      document.querySelector("#playerChannel").textContent = profile.church_name || profile.username || "Live broadcast";
+      document.querySelector("#playerChurch").textContent = [data.speaker, data.venue].filter(Boolean).join(" · ");
+      document.querySelector("#playerListeners").textContent = Number(data.listener_count || 0).toLocaleString();
+      const { data: comments } = await window.Sonora.getComments(data.id);
+      renderComments(comments);
+    });
+  }
   window.SonoraLiveKit?.join("abundant-grace-live", "listener").catch((error) => {
     document.querySelector("#playerTitle").dataset.error = error.message;
   });
@@ -269,11 +316,20 @@ document.querySelector("#mainPlayerButton").addEventListener("click", (event) =>
   event.currentTarget.textContent = event.currentTarget.textContent === "▶" ? "Ⅱ" : "▶";
 });
 document.querySelector("#playerLike").addEventListener("click", (event) => {
-  event.currentTarget.textContent = event.currentTarget.textContent === "♡" ? "♥" : "♡";
+  const button = event.currentTarget;
+  const liked = button.textContent === "♥";
+  button.textContent = liked ? "♡" : "♥";
+  window.Sonora.supabase.auth.getUser().then(({ data: { user } }) => {
+    if (user && currentBroadcast?.id) window.Sonora.toggleLike(currentBroadcast.id, user.id, liked);
+  });
 });
 document.querySelector("#followButton").addEventListener("click", (event) => {
   const following = event.currentTarget.classList.toggle("following");
   event.currentTarget.textContent = following ? "✓ Following" : "+ Follow church";
+  window.Sonora.supabase.auth.getUser().then(({ data: { user } }) => {
+    const broadcasterId = currentBroadcast?.broadcaster_id;
+    if (user && broadcasterId) window.Sonora.toggleFollow(broadcasterId, user.id, !following);
+  });
 });
 document.querySelector("#playerShare").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(window.location.href); } catch {}
@@ -284,10 +340,15 @@ document.querySelector("#commentForm").addEventListener("submit", (event) => {
   const input = event.currentTarget.querySelector("input");
   const body = input.value.trim();
   if (!body) return;
-  const item = document.createElement("div");
-  item.innerHTML = `<i>YO</i><p><strong>You</strong><br />${body.replace(/[<>&]/g, "")}</p><span>♡</span>`;
-  document.querySelector(".comment-list").appendChild(item);
-  input.value = "";
+  window.Sonora.supabase.auth.getUser().then(async ({ data: { user } }) => {
+    if (!user || !currentBroadcast?.id) return;
+    const { error } = await window.Sonora.addComment({ broadcastId: currentBroadcast.id, authorId: user.id, body });
+    if (!error) {
+      input.value = "";
+      const { data: comments } = await window.Sonora.getComments(currentBroadcast.id);
+      renderComments(comments);
+    }
+  });
 });
 
 document.querySelector(".app-shell").style.display = "none";

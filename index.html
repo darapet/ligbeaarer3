@@ -95,6 +95,20 @@
              <div class="broadcast-list" id="recentBroadcasts"><div class="empty-state">Your recent broadcasts will appear here.</div></div>
           </section>
         </div>
+        <section class="settings-view" id="profile-settings">
+          <div class="settings-heading"><p class="eyebrow">YOUR ACCOUNT</p><h1>Profile settings</h1><p>Keep your church profile current for listeners.</p></div>
+          <form class="settings-form" id="profileForm">
+            <div class="settings-grid">
+              <label>First name<input name="first_name" /></label><label>Last name<input name="last_name" /></label>
+              <label>Username<input name="username" /></label><label>Church or ministry name<input name="church_name" /></label>
+              <label>Short description<textarea name="short_description" maxlength="160"></textarea></label><label>Venue <span class="optional">OPTIONAL</span><input name="venue" /></label>
+              <label class="wide">Long description<textarea name="long_description" rows="5"></textarea></label>
+              <label>Theme colour<input type="color" name="theme_color" /></label><label>Logo URL <span class="optional">OPTIONAL</span><input name="logo_url" type="url" /></label>
+            </div>
+            <div class="settings-actions"><button class="button button-dark" type="submit">Save profile <span>✓</span></button><span id="profileSaveMessage"></span></div>
+          </form>
+          <form class="settings-form password-form" id="passwordForm"><div><p class="eyebrow">SECURITY</p><h2>Change password</h2></div><label>New password<input name="password" type="password" minlength="8" required /></label><button class="button button-quiet" type="submit">Update password</button><span id="passwordSaveMessage"></span></form>
+        </section>
         <div class="listener-view" id="listener-view">
           <section class="listener-hero">
             <div class="listener-hero-copy">
