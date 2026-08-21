@@ -67,9 +67,10 @@ document.querySelector("#authForm").addEventListener("submit", async (event) => 
   const form = new FormData(event.currentTarget);
   const accountType = document.querySelector("[data-account].selected").dataset.account;
   const isSignin = event.currentTarget.dataset.mode === "signin";
+  let result;
   try {
     if (window.Sonora) {
-      const result = isSignin
+      result = isSignin
         ? await window.Sonora.signIn(form.get("email"), form.get("password"))
         : await window.Sonora.signUp({ email: form.get("email"), password: form.get("password"), username: form.get("username"), firstName: form.get("firstName"), lastName: form.get("lastName"), accountType });
       if (result.error) {
@@ -97,10 +98,16 @@ document.querySelector("#authForm").addEventListener("submit", async (event) => 
         return;
       }
     }
-    if (accountType === "broadcaster") {
-      authModal.classList.remove("show");
-      wizardModal.classList.add("show");
-    } else enterApp("listen");
+    // Supabase may accept the signup but require email confirmation first.
+    // Do not send a user into the app without an authenticated session.
+    if (!isSignin && !result?.data?.session) {
+      openAuth(accountType, true);
+      document.querySelector("#authSub").textContent =
+        "Check your email to confirm your account, then sign in to continue.";
+      return;
+    }
+    if (accountType === "broadcaster") openWizard();
+    else enterApp("listen");
   } catch (error) {
     document.querySelector("#authSub").textContent = "We couldn’t reach Supabase right now. Check your connection and try again.";
   } finally {
@@ -116,7 +123,7 @@ document.querySelector("#authForm").addEventListener("submit", async (event) => 
 
 const wizardPages = [
   '<p class="eyebrow">BROADCAST SETUP · 02</p><h2>Check your sound.</h2><p class="wizard-sub">Test only your microphone. This private test is never saved.</p><div class="mic-test"><div class="mic-icon">♩</div><div><strong>Default microphone</strong><small>Browser audio input</small></div><span class="sound-bars">▂ ▅ ▇ ▅ ▂</span></div><button class="test-button" id="micTestButton">Allow microphone & test <span>▶</span></button><div class="equalizer" id="micMeter"><span>LEVEL</span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="mic-status" id="micStatus">Your microphone test is private and is not saved.</p><div class="wizard-actions"><button class="button button-dark next-step">Continue <span>→</span></button></div>',
-  '<p class="eyebrow">BROADCAST SETUP · 03</p><h2>Shape the sound.</h2><p class="wizard-sub">Adjust your studio sound before going live.</p><div class="sound-controls sound-controls-large"><label>Volume <input type="range" min="0" max="100" value="80" /></label><label>Bass <input type="range" min="-12" max="12" value="0" /></label><label>Treble <input type="range" min="-12" max="12" value="0" /></label><label>Echo <input type="range" min="0" max="100" value="12" /></label><label>Pitch <input type="range" min="-12" max="12" value="0" /></label></div><div class="eq-preview"><span>LOW</span><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span>HIGH</span></div><div class="wizard-actions"><button class="button button-dark next-step">Continue <span>→</span></button></div>',
+  '<p class="eyebrow">BROADCAST SETUP · 03</p><h2>Shape the sound.</h2><p class="wizard-sub">Start with the essentials. You can fine-tune the studio while live.</p><div class="sound-controls sound-controls-large"><label>Volume <input type="range" min="0" max="100" value="80" /></label><label>Echo <input type="range" min="0" max="100" value="12" /></label></div><div class="eq-preview"><span>LOW</span><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span>HIGH</span></div><details class="advanced-sound"><summary>Advanced sound controls</summary><div class="sound-controls"><label>Bass <input type="range" min="-12" max="12" value="0" /></label><label>Treble <input type="range" min="-12" max="12" value="0" /></label><label>Pitch <input type="range" min="-12" max="12" value="0" /></label></div></details><div class="wizard-actions"><button class="button button-dark next-step">Continue <span>→</span></button></div>',
   '<p class="eyebrow">BROADCAST SETUP · 04</p><h2>Make it yours.</h2><p class="wizard-sub">A final look before you share this with your community.</p><div class="preview-card"><span class="live-badge"><i></i> PREVIEW</span><h3>Sunday Worship</h3><p>Pastor Daniel · Abundant Grace Chapel</p><div class="preview-wave">〰〰〰〰</div></div><div class="wizard-actions"><button class="button button-dark next-step">Continue <span>→</span></button></div>',
   '<p class="eyebrow">BROADCAST SETUP · 05</p><h2>You’re ready to share.</h2><p class="wizard-sub">Your community is waiting. You can adjust the studio controls while you’re live.</p><div class="ready-card"><span>✦</span><strong>Sunday Worship</strong><small>Not live yet · Abundant Grace Chapel</small></div><div class="wizard-actions"><button class="button button-dark finish-broadcast">Go live <span>↗</span></button></div>'
 ];
