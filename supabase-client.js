@@ -29,6 +29,10 @@ window.Sonora = {
   async getFollowerCount(broadcasterId) {
     return supabaseClient.from("follows").select("*", { count: "exact", head: true }).eq("broadcaster_id", broadcasterId);
   },
+  async getCommentCountForBroadcasts(broadcastIds) {
+    if (!broadcastIds.length) return { count: 0, error: null };
+    return supabaseClient.from("comments").select("*", { count: "exact", head: true }).in("broadcast_id", broadcastIds);
+  },
   async getLiveBroadcasts() {
     return supabaseClient.from("broadcasts").select("*, profiles(church_name, username, logo_url)").eq("status", "live").order("started_at", { ascending: false });
   },

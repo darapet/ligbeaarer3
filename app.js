@@ -83,7 +83,8 @@ const loadRealData = async () => {
   const broadcasts = ownBroadcasts || [];
   document.querySelector("#totalBroadcasts").textContent = broadcasts.length;
   document.querySelector("#totalListeners").textContent = broadcasts.reduce((total, item) => total + Number(item.listener_count || 0), 0).toLocaleString();
-  document.querySelector("#totalComments").textContent = "0";
+  const { count: commentCount } = await window.Sonora.getCommentCountForBroadcasts(broadcasts.map((item) => item.id));
+  document.querySelector("#totalComments").textContent = Number(commentCount || 0).toLocaleString();
   if (profile) {
     const { count } = await window.Sonora.getFollowerCount(profile.id);
     document.querySelector("#totalFollowers").textContent = Number(count || 0).toLocaleString();
