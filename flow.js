@@ -321,6 +321,7 @@ document.querySelector("#backToListen").addEventListener("click", () => {
 });
 document.querySelector("#mainPlayerButton").addEventListener("click", (event) => {
   event.currentTarget.textContent = event.currentTarget.textContent === "▶" ? "Ⅱ" : "▶";
+  window.SonoraLiveKit?.startAudio().catch(() => {});
 });
 document.querySelector("#playerLike").addEventListener("click", (event) => {
   const button = event.currentTarget;
@@ -341,6 +342,10 @@ document.querySelector("#followButton").addEventListener("click", (event) => {
 document.querySelector("#playerShare").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(window.location.href); } catch {}
   window.sonoraShowToast?.();
+});
+window.addEventListener("sonora:audio-blocked", () => {
+  const message = document.querySelector("#playerChurch");
+  if (message) message.textContent = "Tap the play button to enable live audio.";
 });
 document.querySelector("#commentForm").addEventListener("submit", (event) => {
   event.preventDefault();

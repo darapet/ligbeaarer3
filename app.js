@@ -50,6 +50,7 @@ document.querySelectorAll(".round-play, .discover-play").forEach((button) => {
 
 document.querySelector("#playerPlay").addEventListener("click", (event) => {
   event.currentTarget.textContent = event.currentTarget.textContent === "▶" ? "Ⅱ" : "▶";
+  window.SonoraLiveKit?.startAudio?.().catch(() => {});
 });
 
 document.querySelectorAll(".filter-pill").forEach((pill) => {

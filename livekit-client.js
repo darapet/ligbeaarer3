@@ -41,7 +41,7 @@ window.SonoraLiveKit = (() => {
       room = new livekit.Room({ adaptiveStream: true, dynacast: true });
       if (role === "listener") {
         room.on(livekit.RoomEvent.TrackSubscribed, (track) => {
-          if (track.kind !== livekit.Track.Kind.Audio) return;
+          if (track.kind !== "audio" && track.kind !== livekit.Track?.Kind?.Audio) return;
           const element = track.attach();
           element.autoplay = true;
           element.setAttribute("playsinline", "");
@@ -49,7 +49,9 @@ window.SonoraLiveKit = (() => {
           element.style.display = "none";
           document.body.appendChild(element);
           remoteAudioElements.add(element);
-          element.play?.().catch(() => {});
+          element.play?.().catch(() => {
+            window.dispatchEvent(new CustomEvent("sonora:audio-blocked"));
+          });
         });
         room.on(livekit.RoomEvent.TrackUnsubscribed, (track) => {
           track.detach().forEach((element) => {
@@ -59,7 +61,15 @@ window.SonoraLiveKit = (() => {
         });
       }
       await room.connect(credentials.url, credentials.token);
+      if (role === "listener") {
+        try { await room.startAudio(); } catch {}
+      }
       return room;
+    },
+    async startAudio() {
+      if (!room?.startAudio) return;
+      await room.startAudio();
+      remoteAudioElements.forEach((element) => element.play?.().catch(() => {}));
     },
     async publishMicrophone() {
       if (!room) throw new Error("Join the live room before publishing audio.");
