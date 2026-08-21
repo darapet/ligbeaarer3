@@ -280,7 +280,7 @@ const openPlayer = (card) => {
   playerModal.classList.add("show");
   document.querySelector("#miniPlayer").classList.add("visible");
   if (currentBroadcast.id && window.Sonora) {
-    window.Sonora.supabase.from("broadcasts").select("*, profiles(username, first_name, last_name, church_name)").eq("id", currentBroadcast.id).single().then(async ({ data }) => {
+    window.Sonora.supabase.from("broadcasts").select("*, profiles!broadcasts_broadcaster_id_fkey(username, first_name, last_name, church_name)").eq("id", currentBroadcast.id).single().then(async ({ data }) => {
       if (!data) return;
       currentBroadcast = data;
       const profile = data.profiles || {};

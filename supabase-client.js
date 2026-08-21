@@ -54,9 +54,9 @@ window.Sonora = {
     return supabaseClient.from("follows").insert({ broadcaster_id: broadcasterId, listener_id: listenerId });
   },
   async getLiveBroadcasts() {
-    return supabaseClient.from("broadcasts").select("*, profiles(church_name, username, logo_url)").eq("status", "live").order("started_at", { ascending: false });
+    return supabaseClient.from("broadcasts").select("*, profiles!broadcasts_broadcaster_id_fkey(church_name, username, logo_url)").eq("status", "live").order("started_at", { ascending: false });
   },
   async getPublishedBroadcasts() {
-    return supabaseClient.from("broadcasts").select("*, profiles(church_name, username, logo_url)").eq("status", "published").order("created_at", { ascending: false });
+    return supabaseClient.from("broadcasts").select("*, profiles!broadcasts_broadcaster_id_fkey(church_name, username, logo_url)").eq("status", "published").order("created_at", { ascending: false });
   }
 };
