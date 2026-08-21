@@ -40,6 +40,11 @@ body{background:#101210;color:#f4f5f1}
 .test-button{background:#202521;border-color:#3b443c}
 .equalizer,.eq-preview{background:#211b19}
 .preview-card{background:linear-gradient(135deg,#1d2920,#a94d30)}
+.ready-card{width:100%}
+.ready-card .ready-check{margin-left:auto;color:#72c48c;font-style:normal;font-size:18px}
+.studio-preview{display:flex;align-items:center;justify-content:space-between;min-height:105px;padding:20px;border-radius:8px;background:linear-gradient(135deg,#1b2820,#36231e);color:#ff936f}
+.studio-preview .preview-wave{font-size:34px;letter-spacing:-10px}
+.studio-preview small{font:10px "DM Mono";color:#9aa69a}
 .app-shell{background:#101210}
 .sidebar{background:#171a18;border-color:#292d2a;width:238px;padding:25px 15px 18px}
 .sidebar .brand{color:#fff;margin:0 12px 38px}
