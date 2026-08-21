@@ -1,5 +1,6 @@
 window.SonoraLiveKit = (() => {
   let room;
+  const remoteAudioElements = new Set();
   let sdk = window.LivekitClient || window.LiveKitClient || null;
   const tokenEndpoint = `${window.SONORA_CONFIG.url}/functions/v1/livekit-token`;
 
@@ -38,6 +39,25 @@ window.SonoraLiveKit = (() => {
       const credentials = await getToken(roomName, role);
       room?.disconnect();
       room = new livekit.Room({ adaptiveStream: true, dynacast: true });
+      if (role === "listener") {
+        room.on(livekit.RoomEvent.TrackSubscribed, (track) => {
+          if (track.kind !== livekit.Track.Kind.Audio) return;
+          const element = track.attach();
+          element.autoplay = true;
+          element.setAttribute("playsinline", "");
+          element.setAttribute("aria-hidden", "true");
+          element.style.display = "none";
+          document.body.appendChild(element);
+          remoteAudioElements.add(element);
+          element.play?.().catch(() => {});
+        });
+        room.on(livekit.RoomEvent.TrackUnsubscribed, (track) => {
+          track.detach().forEach((element) => {
+            remoteAudioElements.delete(element);
+            element.remove();
+          });
+        });
+      }
       await room.connect(credentials.url, credentials.token);
       return room;
     },
@@ -49,6 +69,8 @@ window.SonoraLiveKit = (() => {
     async leave() {
       room?.disconnect();
       room = null;
+      remoteAudioElements.forEach((element) => element.remove());
+      remoteAudioElements.clear();
     },
     get room() { return room; }
   };
