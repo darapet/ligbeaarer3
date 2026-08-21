@@ -16,6 +16,19 @@ window.Sonora = {
   async signOut() {
     return supabaseClient.auth.signOut();
   },
+  async getCurrentProfile() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return { data: null, error: new Error("Not signed in") };
+    return supabaseClient.from("profiles").select("*").eq("id", user.id).maybeSingle();
+  },
+  async getMyBroadcasts() {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) return { data: [], error: new Error("Not signed in") };
+    return supabaseClient.from("broadcasts").select("*").eq("broadcaster_id", user.id).order("created_at", { ascending: false });
+  },
+  async getFollowerCount(broadcasterId) {
+    return supabaseClient.from("follows").select("*", { count: "exact", head: true }).eq("broadcaster_id", broadcasterId);
+  },
   async getLiveBroadcasts() {
     return supabaseClient.from("broadcasts").select("*, profiles(church_name, username, logo_url)").eq("status", "live").order("started_at", { ascending: false });
   },

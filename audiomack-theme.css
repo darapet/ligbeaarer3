@@ -94,6 +94,8 @@ body{background:#101210;color:#f4f5f1}
 .chart-area{background:#ff784f14}
 .chart-y,.chart-x,.chart-legend{color:#727a72}
 .recent-panel{margin-top:12px}
+.empty-state{padding:28px 18px;text-align:center;color:#7f897f;font-size:12px}
+.empty-chart{min-height:180px;display:grid;place-items:center}
 .broadcast-row{border-color:#292d2a}
 .broadcast-row:hover{background:#1d211e}
 .stream-info strong{color:#eef1eb}

@@ -18,6 +18,7 @@ const enterApp = (view = "overview") => {
   landing.style.display = "none";
   document.querySelector(".app-shell").style.display = "flex";
   document.querySelector(`[data-view="${view}"]`)?.click();
+  window.dispatchEvent(new CustomEvent("sonora:authenticated"));
 };
 const openWizard = () => {
   landing.style.display = "none";
@@ -106,7 +107,10 @@ document.querySelector("#authForm").addEventListener("submit", async (event) => 
         "Check your email to confirm your account, then sign in to continue.";
       return;
     }
-    if (accountType === "broadcaster") openWizard();
+    if (accountType === "broadcaster") {
+      window.dispatchEvent(new CustomEvent("sonora:authenticated"));
+      openWizard();
+    }
     else enterApp("listen");
   } catch (error) {
     document.querySelector("#authSub").textContent = "We couldn’t reach Supabase right now. Check your connection and try again.";
@@ -123,7 +127,7 @@ document.querySelector("#authForm").addEventListener("submit", async (event) => 
 
 const wizardPages = [
   '<p class="eyebrow">BROADCAST SETUP · 02</p><h2>Connect your audio.</h2><p class="wizard-sub">Choose your microphone and check the signal before going live.</p><div class="mic-test"><div class="mic-icon">♩</div><div><strong>Default microphone</strong><small>Browser audio input</small></div><span class="sound-bars">▂ ▅ ▇ ▅ ▂</span></div><button class="test-button" id="micTestButton">Allow microphone & test <span>▶</span></button><div class="equalizer" id="micMeter"><span>LEVEL</span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p class="mic-status" id="micStatus">Your microphone test is private and is not saved.</p><div class="sound-controls sound-controls-large"><label>Volume <input type="range" min="0" max="100" value="80" /></label><label>Echo <input type="range" min="0" max="100" value="12" /></label></div><div class="wizard-actions"><button class="button button-dark next-step">Continue <span>→</span></button></div>',
-  '<p class="eyebrow">BROADCAST SETUP · 03</p><h2>You’re ready to share.</h2><p class="wizard-sub">Your channel is ready. Go live and your listeners can join in real time.</p><div class="ready-card"><span>✦</span><div><strong>Sunday Worship</strong><small>Not live yet · Abundant Grace Chapel</small></div><i class="ready-check">✓</i></div><div class="studio-preview"><span class="preview-wave">〰〰〰〰〰</span><small>Live audio console ready</small></div><div class="wizard-actions"><button class="button button-dark finish-broadcast"><span class="live-dot"></span> Go live <span>↗</span></button></div>'
+  '<p class="eyebrow">BROADCAST SETUP · 03</p><h2>You’re ready to share.</h2><p class="wizard-sub">Your channel is ready. Go live and your listeners can join in real time.</p><div class="ready-card"><span>✦</span><div><strong>Your broadcast</strong><small>Ready for listeners to join</small></div><i class="ready-check">✓</i></div><div class="studio-preview"><span class="preview-wave">〰〰〰〰〰</span><small>Live audio console ready</small></div><div class="wizard-actions"><button class="button button-dark finish-broadcast"><span class="live-dot"></span> Go live <span>↗</span></button></div>'
 ];
 let wizardStep = 0;
 wizardModal.addEventListener("click", (event) => {
@@ -133,8 +137,10 @@ wizardModal.addEventListener("click", (event) => {
   }
   if (!event.target.closest(".next-step")) return;
   if (wizardStep === 0) {
-    const titleInput = document.querySelector("#wizardBody input");
-    window.sonoraBroadcastTitle = titleInput?.value.trim() || "Sunday Worship";
+    const inputs = document.querySelectorAll("#wizardBody input");
+    const titleInput = inputs[0];
+    window.sonoraBroadcastTitle = titleInput?.value.trim() || "Untitled broadcast";
+    window.sonoraBroadcastVenue = inputs[1]?.value.trim() || "";
   }
   wizardStep += 1;
   document.querySelector("#wizardBody").innerHTML = wizardPages[wizardStep - 1];
@@ -190,8 +196,9 @@ wizardModal.addEventListener("click", (event) => {
 let liveTimer;
 const startLiveStudio = () => {
   const body = document.querySelector("#wizardBody");
-  const title = window.sonoraBroadcastTitle || "Sunday Worship";
-  body.innerHTML = `<div class="live-studio-head"><div><p class="eyebrow">YOU ARE LIVE</p><h2>${title.replace(/[<>&]/g, "")}</h2><p class="wizard-sub">Abundant Grace Chapel · Pastor Daniel</p></div><span class="live-pill"><i></i> LIVE <b id="liveTimer">00:00</b></span></div><div class="live-studio-wave"><div class="live-wave-large">〰〰〰〰〰</div><span>Live audio signal</span></div><div class="live-studio-stats"><div><strong>248</strong><small>Listeners</small></div><div><strong>18</strong><small>Comments</small></div><div><strong>00:00</strong><small>Duration</small></div></div><div class="live-controls"><label>Volume <input type="range" min="0" max="100" value="80" /></label><label>Bass <input type="range" min="-12" max="12" value="0" /></label><label>Treble <input type="range" min="-12" max="12" value="0" /></label><label>Echo <input type="range" min="0" max="100" value="12" /></label></div><div class="live-comments"><strong>Live comments</strong><span>“This is beautiful 🙏” · “Joining from Accra” · “Amen!”</span></div><div class="wizard-actions"><button class="button button-end" id="endBroadcast">End broadcast</button></div>`;
+  const title = window.sonoraBroadcastTitle || "Untitled broadcast";
+  const venue = window.sonoraBroadcastVenue ? ` · ${window.sonoraBroadcastVenue.replace(/[<>&]/g, "")}` : "";
+  body.innerHTML = `<div class="live-studio-head"><div><p class="eyebrow">YOU ARE LIVE</p><h2>${title.replace(/[<>&]/g, "")}</h2><p class="wizard-sub">${venue || "Live church audio"}</p></div><span class="live-pill"><i></i> LIVE <b id="liveTimer">00:00</b></span></div><div class="live-studio-wave"><div class="live-wave-large">〰〰〰〰〰</div><span>Live audio signal</span></div><div class="live-studio-stats"><div><strong id="liveListenerCount">0</strong><small>Listeners</small></div><div><strong id="liveCommentCount">0</strong><small>Comments</small></div><div><strong>00:00</strong><small>Duration</small></div></div><div class="live-controls"><label>Volume <input type="range" min="0" max="100" value="80" /></label><label>Bass <input type="range" min="-12" max="12" value="0" /></label><label>Treble <input type="range" min="-12" max="12" value="0" /></label><label>Echo <input type="range" min="0" max="100" value="12" /></label></div><div class="live-comments"><strong>Live comments</strong><span id="liveCommentMessage">Comments from listeners will appear here.</span></div><div class="wizard-actions"><button class="button button-end" id="endBroadcast">End broadcast</button></div>`;
   let seconds = 0;
   window.SonoraLiveKit?.join("abundant-grace-live", "broadcaster")
     .then(() => window.SonoraLiveKit.publishMicrophone())
@@ -239,6 +246,14 @@ document.querySelectorAll(".live-card, .discover-card").forEach((card) => {
   card.addEventListener("click", (event) => {
     if (!event.target.closest("button")) openPlayer(card);
   });
+});
+document.addEventListener("click", (event) => {
+  const card = event.target.closest(".live-card, .discover-card");
+  if (card && !event.target.closest("button")) openPlayer(card);
+  if (event.target.closest(".round-play, .discover-play")) {
+    event.stopPropagation();
+    openPlayer(event.target.closest(".live-card, .discover-card"));
+  }
 });
 document.querySelectorAll(".round-play, .discover-play").forEach((button) => {
   button.addEventListener("click", (event) => {
