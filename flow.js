@@ -1,11 +1,17 @@
 const landing = document.querySelector("#landingScreen");
 const authModal = document.querySelector("#authModal");
 const wizardModal = document.querySelector("#wizardModal");
-const openAuth = (mode = "listener") => {
+const openAuth = (mode = "listener", signin = false) => {
   authModal.classList.add("show");
   document.querySelectorAll("[data-account]").forEach((button) => button.classList.toggle("selected", button.dataset.account === mode));
   document.querySelector("#authTitle").textContent = mode === "broadcaster" ? "Build your gathering." : "Come on in.";
   document.querySelector("#authSub").textContent = mode === "broadcaster" ? "Create your broadcaster account and give your church a voice." : "Sign in to continue listening with your community.";
+  const form = document.querySelector("#authForm");
+  form.dataset.mode = signin ? "signin" : "signup";
+  document.querySelector("#nameFields").style.display = signin ? "none" : "grid";
+  document.querySelector("#authSubmit").innerHTML = signin ? "Sign in <span>↗</span>" : "Create account <span>↗</span>";
+  document.querySelector("#authSwitch").innerHTML = signin ? 'New here? <button>Create an account</button>' : 'Already have an account? <button>Sign in</button>';
+  document.querySelector("#authSwitch button").addEventListener("click", toggleAuthMode);
 };
 const enterApp = (view = "overview") => {
   authModal.classList.remove("show");
@@ -26,7 +32,7 @@ document.querySelector("#listenCta").addEventListener("click", () => {
   document.querySelector(".app-shell").style.display = "flex";
   document.querySelector('[data-view="listen"]').click();
 });
-document.querySelector("#landingLogin").addEventListener("click", () => openAuth("listener"));
+document.querySelector("#landingLogin").addEventListener("click", () => openAuth("listener", true));
 document.querySelector("#startBroadcast").addEventListener("click", openWizard);
 document.querySelector("#setupBroadcast").addEventListener("click", openWizard);
 document.querySelectorAll("[data-close]").forEach((button) => button.addEventListener("click", () => {
