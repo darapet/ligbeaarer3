@@ -110,7 +110,11 @@ const loadRealData = async () => {
   const [liveResult, publishedResult] = await Promise.all([window.Sonora.getLiveBroadcasts(), window.Sonora.getPublishedBroadcasts()]);
   const live = liveResult.data || [];
   const published = publishedResult.data || [];
-  document.querySelector("#liveBroadcasts").innerHTML = live.length ? live.map((item) => renderBroadcast(item, "live")).join("") : '<div class="empty-state">No live broadcasts right now.</div>';
+  document.querySelector("#liveBroadcasts").innerHTML = liveResult.error
+    ? `<div class="empty-state">Live broadcasts could not load: ${escapeHtml(liveResult.error.message)}</div>`
+    : live.length
+      ? live.map((item) => renderBroadcast(item, "live")).join("")
+      : '<div class="empty-state">No live broadcasts right now.</div>';
   document.querySelector("#publishedBroadcasts").innerHTML = published.length ? published.map((item) => renderBroadcast(item)).join("") : '<div class="empty-state">Published broadcasts will appear here.</div>';
 };
 
